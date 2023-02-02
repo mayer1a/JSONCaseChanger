@@ -42,7 +42,7 @@ public struct JSONCaseChanger {
         switch self.choosenCase {
 
         case .toCamelCase:
-            return ""
+            return inputString.toCamelCase()
 
         case .toSnakeCase:
             return ""
@@ -52,4 +52,34 @@ public struct JSONCaseChanger {
         }
     }
     
+}
+
+// MARK: - Extensions
+
+fileprivate extension String {
+
+    func toCamelCase() -> Self {
+        let toCamelNormalPattern = "([A-Z]+|[a-z])([A-Z][a-z]|[0-9])"
+        let toCamelAcronymPattern = "([a-z])([A-Z]|[0-9])"
+        let unionTemplate = " "
+
+        let partialResultString = self
+            .processCaseRegex(pattern: toCamelNormalPattern, with: unionTemplate)?
+            .processCaseRegex(pattern: toCamelAcronymPattern, with: unionTemplate) ?? self
+
+        return partialResultString
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { !$0.isEmpty }
+            .enumerated()
+            .map { $0.offset == 0 ? $0.element.lowercased() : $0.element.capitalized }
+            .joined()
+    }
+
+    private func processCaseRegex(pattern: String, with unionTemplate: String) -> Self? {
+        let regex = try? NSRegularExpression(pattern: pattern, options: [])
+        let range = NSRange(location: 0, length: count)
+
+        return regex?.stringByReplacingMatches(in: self, range: range,
+                                               withTemplate: "$1\(unionTemplate)$2")
+    }
 }
