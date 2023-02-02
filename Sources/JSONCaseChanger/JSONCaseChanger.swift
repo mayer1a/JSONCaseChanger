@@ -45,10 +45,10 @@ public struct JSONCaseChanger {
             return inputString.toCamelCase()
 
         case .toSnakeCase:
-            return ""
+            return inputString.toSnakeCase()
 
         case .toKebabCase:
-            return ""
+            return inputString.toKebabCase()
         }
     }
     
