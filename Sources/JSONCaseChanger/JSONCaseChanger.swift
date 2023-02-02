@@ -75,10 +75,18 @@ fileprivate extension String {
             .joined()
     }
 
-
     func toSnakeCase() -> Self {
         let charSetForRemove = CharacterSet([" ", "-"])
         let unionTemplate = "_"
+
+        return self
+            .getStringFromCamel(with: unionTemplate)
+            .getStringWithReplaced(charset: charSetForRemove, to: unionTemplate)
+    }
+
+    func toKebabCase() -> Self {
+        let charSetForRemove = CharacterSet([" ", "_"])
+        let unionTemplate = "-"
 
         return self
             .getStringFromCamel(with: unionTemplate)
