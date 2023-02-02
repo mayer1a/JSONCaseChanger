@@ -75,6 +75,35 @@ fileprivate extension String {
             .joined()
     }
 
+
+    func toSnakeCase() -> Self {
+        let charSetForRemove = CharacterSet([" ", "-"])
+        let unionTemplate = "_"
+
+        return self
+            .getStringFromCamel(with: unionTemplate)
+            .getStringWithReplaced(charset: charSetForRemove, to: unionTemplate)
+    }
+
+    private func getStringWithReplaced(charset: CharacterSet, to separator: String) -> Self {
+        return self
+            .components(separatedBy: charset)
+            .filter { !$0.isEmpty }
+            .joined(separator: separator)
+    }
+
+    private func getStringFromCamel(with unionTemplate: String) -> Self {
+        let fromCamelAcronymPattern = "([A-Z]+|[a-z])([A-Z][a-z]|[0-9])"
+        let fromCamelNormalPattern = "([a-z])([A-Z]|[0-9])"
+        let fromCamelDigitPattern = "([0-9])([A-Z]|[a-z])"
+
+        return self
+            .processCaseRegex(pattern: fromCamelAcronymPattern, with: unionTemplate)?
+            .processCaseRegex(pattern: fromCamelNormalPattern, with: unionTemplate)?
+            .processCaseRegex(pattern: fromCamelDigitPattern, with: unionTemplate)?
+            .lowercased() ?? self.lowercased()
+    }
+
     private func processCaseRegex(pattern: String, with unionTemplate: String) -> Self? {
         let regex = try? NSRegularExpression(pattern: pattern, options: [])
         let range = NSRange(location: 0, length: count)
